@@ -3,6 +3,7 @@ import useStateRef from "react-usestateref";
 import "./App.css";
 import LoginButton from "./components/LoginButton";
 import axios from "axios";
+import SongList from "./components/SongList";
 
 function App() {
   const [token, setToken] = useState("");
@@ -76,8 +77,7 @@ function App() {
           : 
             dataSongRef.current.length < 1 ? ""
           :
-            <div className="wrapper-list-song">
-            </div>
+            <SongList dataSong={dataSongRef.current} />
           } 
         </div>
       )}
