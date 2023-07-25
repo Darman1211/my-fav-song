@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useStateRef from "react-usestateref";
 import "./App.css";
 import LoginButton from "./components/LoginButton";
 import axios from "axios";
@@ -6,7 +7,8 @@ import axios from "axios";
 function App() {
   const [token, setToken] = useState("");
   const [querySearch, setQuerySearch] = useState("");
-  const [dataSong, setDataSong] = useState([]);
+  const [dataSong, setDataSong, dataSongRef] = useStateRef([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -29,21 +31,24 @@ function App() {
     setQuerySearch(target.value);
   } 
 
-  const handleClick = () => {
+  const handleClick = async () => {
     try {
+      setLoading(true);
       let url = 'https://api.spotify.com/v1/search?q='+querySearch+'&type=track,artist';
 
-      axios.get(url, {
+      await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token
         },
       }).then(res => {
         setDataSong(res.data.tracks.items);
-      })
+      });
     } catch (error) {
       console.log(error);
+      setLoading(false);
     } finally {
-      console.log('data song -->', dataSong);
+      setLoading(false);
+      console.log('data song -->', dataSongRef.current);
     }
   }
 
@@ -67,9 +72,13 @@ function App() {
             </div>
             <a href="#" className="logout-btn">LOG OUT</a>
           </div>
-          <div className="song-list">
-            Song List
-          </div>
+          {loading ? "Loading..." 
+          : 
+            dataSongRef.current.length < 1 ? ""
+          :
+            <div className="wrapper-list-song">
+            </div>
+          } 
         </div>
       )}
     </>
