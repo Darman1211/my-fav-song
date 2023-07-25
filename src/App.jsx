@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import LoginButton from "./components/LoginButton";
+import axios from "axios";
 
 function App() {
   const [token, setToken] = useState("");
+  const [querySearch, setQuerySearch] = useState("");
+  const [dataSong, setDataSong] = useState([]);
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -21,26 +25,54 @@ function App() {
     setToken(token);
   }, []);
 
-  const LoginButton = () => {
-    let client_id = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-    let scope = "playlist-modify-private";
-    let redirect_uri = "http://localhost:3000";
+  const handleChangeInput = ({ target }) => {
+    setQuerySearch(target.value);
+  } 
 
-    console.log("client id", client_id);
+  const handleClick = () => {
+    try {
+      let url = 'https://api.spotify.com/v1/search?q='+querySearch+'&type=track,artist';
 
-    let spotify_url = "https://accounts.spotify.com/authorize";
-    spotify_url += "?response_type=token";
-    spotify_url += "&client_id=" + encodeURIComponent(client_id);
-    spotify_url += "&scope=" + encodeURIComponent(scope);
-    spotify_url += "&redirect_uri=" + encodeURIComponent(redirect_uri);
-
-    return <a href={spotify_url}>LOG IN WITH SPOTIFY</a>;
-  };
+      axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+      }).then(res => {
+        setDataSong(res.data.tracks.items);
+      })
+    } catch (error) {
+      console.log(error);
+    } finally {
+      console.log('data song -->', dataSong);
+    }
+  }
 
   return (
-    <div className="bg-dark_main min-h-screen">
-      {token ? <a href="#">LOG OUT</a> : <LoginButton />}
-    </div>
+    <>
+      {!token ? (
+        <div className="App">
+          <LoginButton />
+        </div>
+      ) : (
+        <div className="container">
+          <div className="container-top">
+            <div className="container-search-song">
+              <input
+                type="text"
+                value={querySearch}
+                onChange={(e) => handleChangeInput(e)}
+                placeholder="Type to search..."
+              />
+              <button onClick={() => handleClick()}>Search</button>
+            </div>
+            <a href="#" className="logout-btn">LOG OUT</a>
+          </div>
+          <div className="song-list">
+            Song List
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
