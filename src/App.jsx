@@ -53,6 +53,11 @@ function App() {
     }
   }
 
+  const handleClickLogout = () => {
+    localStorage.clear();
+    setToken("");
+  }
+
   return (
     <>
       {!token ? (
@@ -71,7 +76,7 @@ function App() {
               />
               <button onClick={() => handleClick()}>Search</button>
             </div>
-            <a href="#" className="logout-btn">LOG OUT</a>
+            <a className="logout-btn" onClick={() => handleClickLogout()}>LOG OUT</a>
           </div>
           {loading ? "Loading..." 
           : 

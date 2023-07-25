@@ -41,4 +41,5 @@
   color: white;
   display: flex;
   margin-left: auto;
+  cursor: pointer;
 }
